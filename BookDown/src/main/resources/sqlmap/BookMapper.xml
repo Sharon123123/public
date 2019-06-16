@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springmvc.dao.BookMapper">
+    <resultMap id="BaseResultMap" type="com.springmvc.entity.Book">
+        <id column="b_id" property="bId" jdbcType="INTEGER"/>
+        <result column="b_name" property="bName" jdbcType="VARCHAR"/>
+        <result column="b_author" property="bAuthor" jdbcType="VARCHAR"/>
+        <result column="b_publishing" property="bPublishing" jdbcType="VARCHAR"/>
+        <result column="b_bookTag" property="bBooktag" jdbcType="INTEGER"/>
+        <result column="b_score" property="bScore" jdbcType="VARCHAR"/>
+        <result column="b_ISBN" property="bIsbn" jdbcType="CHAR"/>
+        <result column="b_intime" property="bIntime" jdbcType="VARCHAR"/>
+        <result column="b_descripation" property="bDescripation" jdbcType="VARCHAR"/>
+        <result column="author_descripation" property="authorDescripation" jdbcType="VARCHAR"/>
+        <result column="b_photo" property="bPhoto" jdbcType="VARCHAR"/>
+        <result column="b_times" property="bTimes" jdbcType="INTEGER"/>
+        <result column="b_downLink" property="bDownlink" jdbcType="VARCHAR"/>
+        <result column="b_look" property="bLook" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        b_id ,
+        b_name,
+        b_author,
+        b_publishing,
+        b_bookTag,
+        b_score,
+        b_ISBN,
+        b_intime,
+        b_descripation,
+        author_descripation,
+        b_photo,
+        b_times,
+        b_downLink,
+        b_look
+    </sql>
+    <sql id="Admin_Columen_List">
+        b_id
+        as
+        bId ,
+        b_name
+        as
+        bName,
+        b_author
+        as
+        bAuthor,
+        b_publishing
+        as
+        bPublishing,
+        bt_name
+        as
+        bBooktag,
+        b_score
+        as
+        bScore,
+        b_ISBN
+        as
+        bIsbn,
+        b_intime
+        as
+        bIntime,
+        b_descripation
+        as
+        bDescripation,
+        author_descripation
+        as
+        authorDescripation,
+        b_photo
+        as
+        bPhoto,
+        b_times
+        as
+        bTimes,
+        b_downLink
+        as
+        bDownlink,
+        b_look
+        as
+        bLook
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        where b_id = #{bId,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from book
+        where b_id = #{bId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.springmvc.entity.Book">
+        insert into book (b_id, b_name, b_author,
+                          b_publishing, b_bookTag, b_score,
+                          b_ISBN, b_intime, b_descripation,
+                          author_descripation, b_photo, b_times,
+                          b_downLink, b_look)
+        values (#{bId,jdbcType=INTEGER}, #{bName,jdbcType=VARCHAR}, #{bAuthor,jdbcType=VARCHAR},
+                #{bPublishing,jdbcType=VARCHAR}, #{bBooktag,jdbcType=INTEGER}, #{bScore,jdbcType=VARCHAR},
+                #{bIsbn,jdbcType=CHAR}, #{bIntime,jdbcType=VARCHAR}, #{bDescripation,jdbcType=VARCHAR},
+                #{authorDescripation,jdbcType=VARCHAR}, #{bPhoto,jdbcType=VARCHAR}, #{bTimes,jdbcType=INTEGER},
+                #{bDownlink,jdbcType=VARCHAR}, #{bLook,jdbcType=INTEGER})
+    </insert>
+
+
+    <!-- 根据下载量或者浏览量进行查询-->
+
+    <select id="selectBookByChoice" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        order by
+        <if test="choice == 0">
+            b_look
+        </if>
+        <if test=" choice == 1">
+            b_score
+        </if>
+        desc limit 20
+    </select>
+
+    <select id="searchBook" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        <if test="name !=null">
+            where LOCATE(#{name},b_name) or LOCATE(#{name},b_author)
+        </if>
+
+    </select>
+
+    <!-- 管理员查询图书数据-->
+    <select id="adminGetBook" parameterType="Map" resultType="com.springmvc.entity.AdminBook">
+        select
+        <include refid="Admin_Columen_List"/>
+        from book inner join booktype b on book.b_bookTag = b.bt_id
+        <if test=" tagid !=0">
+            where b_bookTag = #{tagid}
+        </if>
+        order by  b_id desc
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <!-- 根据分页数据 start 和size 查询数据-->
+    <select id="findByPage" parameterType="Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from book
+        <if test=" tagid !=0">
+            where b_bookTag = #{tagid}
+        </if>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+
+
+    </select>
+
+    <!-- 查询所有的图书 -->
+    <select id="selectBookList" resultMap="BaseResultMap">
+
+        select
+
+        <include refid="Base_Column_List"/>
+
+        from book
+
+    </select>
+
+
+    <!-- 查询图书记录总数 -->
+
+    <select id="selectCount" resultType="int" parameterType="int">
+
+        select count(*)
+        from book
+        <if test="tagid!=0">
+            where b_bookTag=#{tagid}
+        </if>
+
+    </select>
+
+    <insert id="insertSelective" parameterType="com.springmvc.entity.Book">
+        insert into book
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="bId != null">
+                b_id,
+            </if>
+            <if test="bName != null">
+                b_name,
+            </if>
+            <if test="bAuthor != null">
+                b_author,
+            </if>
+            <if test="bPublishing != null">
+                b_publishing,
+            </if>
+            <if test="bBooktag != null">
+                b_bookTag,
+            </if>
+            <if test="bScore != null">
+                b_score,
+            </if>
+            <if test="bIsbn != null">
+                b_ISBN,
+            </if>
+            <if test="bIntime != null">
+                b_intime,
+            </if>
+            <if test="bDescripation != null">
+                b_descripation,
+            </if>
+            <if test="authorDescripation != null">
+                author_descripation,
+            </if>
+            <if test="bPhoto != null">
+                b_photo,
+            </if>
+            <if test="bTimes != null">
+                b_times,
+            </if>
+            <if test="bDownlink != null">
+                b_downLink,
+            </if>
+            <if test="bLook != null">
+                b_look,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="bId != null">
+                #{bId,jdbcType=INTEGER},
+            </if>
+            <if test="bName != null">
+                #{bName,jdbcType=VARCHAR},
+            </if>
+            <if test="bAuthor != null">
+                #{bAuthor,jdbcType=VARCHAR},
+            </if>
+            <if test="bPublishing != null">
+                #{bPublishing,jdbcType=VARCHAR},
+            </if>
+            <if test="bBooktag != null">
+                #{bBooktag,jdbcType=INTEGER},
+            </if>
+            <if test="bScore != null">
+                #{bScore,jdbcType=VARCHAR},
+            </if>
+            <if test="bIsbn != null">
+                #{bIsbn,jdbcType=CHAR},
+            </if>
+            <if test="bIntime != null">
+                #{bIntime,jdbcType=VARCHAR},
+            </if>
+            <if test="bDescripation != null">
+                #{bDescripation,jdbcType=VARCHAR},
+            </if>
+            <if test="authorDescripation != null">
+                #{authorDescripation,jdbcType=VARCHAR},
+            </if>
+            <if test="bPhoto != null">
+                #{bPhoto,jdbcType=VARCHAR},
+            </if>
+            <if test="bTimes != null">
+                #{bTimes,jdbcType=INTEGER},
+            </if>
+            <if test="bDownlink != null">
+                #{bDownlink,jdbcType=VARCHAR},
+            </if>
+            <if test="bLook != null">
+                #{bLook,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.springmvc.entity.Book">
+        update book
+        <set>
+            <if test="bName != null">
+                b_name = #{bName,jdbcType=VARCHAR},
+            </if>
+            <if test="bAuthor != null">
+                b_author = #{bAuthor,jdbcType=VARCHAR},
+            </if>
+            <if test="bPublishing != null">
+                b_publishing = #{bPublishing,jdbcType=VARCHAR},
+            </if>
+            <if test="bBooktag != null">
+                b_bookTag = #{bBooktag,jdbcType=INTEGER},
+            </if>
+            <if test="bScore != null">
+                b_score = #{bScore,jdbcType=VARCHAR},
+            </if>
+            <if test="bIsbn != null">
+                b_ISBN = #{bIsbn,jdbcType=CHAR},
+            </if>
+            <if test="bIntime != null">
+                b_intime = #{bIntime,jdbcType=VARCHAR},
+            </if>
+            <if test="bDescripation != null">
+                b_descripation = #{bDescripation,jdbcType=VARCHAR},
+            </if>
+            <if test="authorDescripation != null">
+                author_descripation = #{authorDescripation,jdbcType=VARCHAR},
+            </if>
+            <if test="bPhoto != null">
+                b_photo = #{bPhoto,jdbcType=VARCHAR},
+            </if>
+            <if test="bTimes != null">
+                b_times = #{bTimes,jdbcType=INTEGER},
+            </if>
+            <if test="bDownlink != null">
+                b_downLink = #{bDownlink,jdbcType=VARCHAR},
+            </if>
+            <if test="bLook != null">
+                b_look = #{bLook,jdbcType=INTEGER},
+            </if>
+        </set>
+        where b_id = #{bId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.Book">
+        update book
+        set b_name              = #{bName,jdbcType=VARCHAR},
+            b_author            = #{bAuthor,jdbcType=VARCHAR},
+            b_publishing        = #{bPublishing,jdbcType=VARCHAR},
+            b_bookTag           = #{bBooktag,jdbcType=INTEGER},
+            b_score             = #{bScore,jdbcType=VARCHAR},
+            b_ISBN              = #{bIsbn,jdbcType=CHAR},
+            b_intime            = #{bIntime,jdbcType=VARCHAR},
+            b_descripation      = #{bDescripation,jdbcType=VARCHAR},
+            author_descripation = #{authorDescripation,jdbcType=VARCHAR},
+            b_photo             = #{bPhoto,jdbcType=VARCHAR},
+            b_times             = #{bTimes,jdbcType=INTEGER},
+            b_downLink          = #{bDownlink,jdbcType=VARCHAR},
+            b_look              = #{bLook,jdbcType=INTEGER}
+        where b_id = #{bId,jdbcType=INTEGER}
+    </update>
+</mapper>

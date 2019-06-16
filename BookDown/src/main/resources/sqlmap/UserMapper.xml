@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springmvc.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.springmvc.entity.User">
+        <id column="u_id" property="uId" jdbcType="VARCHAR"/>
+        <result column="u_name" property="uName" jdbcType="VARCHAR"/>
+        <result column="u_pwd" property="uPwd" jdbcType="VARCHAR"/>
+        <result column="u_sex" property="uSex" jdbcType="BIT"/>
+        <result column="u_phone" property="uPhone" jdbcType="VARCHAR"/>
+        <result column="u_email" property="uEmail" jdbcType="VARCHAR"/>
+        <result column="u_typeid" property="uTypeid" jdbcType="INTEGER"/>
+        <result column="u_photo" property="uPhoto" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        u_id,
+        u_name,
+        u_pwd,
+        u_sex,
+        u_phone,
+        u_email,
+        u_typeid,
+        u_photo
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where u_id = #{uId,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据用户名查找用户，进行登录验证-->
+    <select id="getUserByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where u_name = #{uName,jdbcType=VARCHAR}
+
+
+    </select>
+
+    <select id="selectSelective" resultMap="BaseResultMap" parameterType="com.springmvc.entity.User">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        <where>
+            <if test="uId != null">
+                u_id = #{uId,jdbcType=VARCHAR}
+            </if>
+            <if test="uName != null">
+                AND u_name = #{uName,jdbcType=VARCHAR}
+            </if>
+            <if test="uPwd != null">
+                AND u_pwd = #{uPwd,jdbcType=VARCHAR}
+            </if>
+            <if test="uSex != null">
+                AND u_sex = #{uSex,jdbcType=BIT}
+            </if>
+            <if test="uPhone != null">
+                AND u_phone = #{uPhone,jdbcType=VARCHAR}
+            </if>
+            <if test="uEmail != null">
+                AND u_email = #{uEmail,jdbcType=VARCHAR}
+            </if>
+            <if test="uTypeid != null">
+                AND u_typeid = #{uTypeid,jdbcType=INTEGER}
+            </if>
+            <if test="uPhoto != null">
+                AND u_photo = #{uPhoto,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询所有用户-->
+    <select id="selectAllUser" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+    </select>
+
+
+    <select id="findByPage" resultType="com.springmvc.entity.UserType" parameterType="Map">
+        select
+        u_id as uId,u_name as uName,u_phone as uPhone,u_email as uEmail,d_name as uTypeid
+        from duty inner join user u on duty.d_id = u.u_typeid
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+
+    <!-- 查询用户总数-->
+    <select id="countUser" resultType="java.lang.Integer">
+        select count(*)
+        from user
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from user
+        where u_id = #{uId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.springmvc.entity.User">
+        insert into user (u_id, u_name, u_pwd,
+                          u_sex, u_phone, u_email, u_typeid,
+                          u_photo)
+        values (#{uId,jdbcType=VARCHAR}, #{uName,jdbcType=VARCHAR}, #{uPwd,jdbcType=VARCHAR},
+                #{uSex,jdbcType=BIT}, #{uPhone,jdbcType=VARCHAR}, #{uEmail,jdbcType=VARCHAR},
+                #{uTypeid,jdbcType=INTEGER},
+                #{uPhoto,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.springmvc.entity.User">
+        insert into user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uId != null">
+                u_id,
+            </if>
+            <if test="uName != null">
+                u_name,
+            </if>
+            <if test="uPwd != null">
+                u_pwd,
+            </if>
+            <if test="uSex != null">
+                u_sex,
+            </if>
+            <if test="uPhone != null">
+                u_phone,
+            </if>
+            <if test="uEmail != null">
+                u_email,
+            </if>
+            <if test="uTypeid != null">
+                u_typeid,
+            </if>
+            <if test="uPhoto != null">
+                u_photo,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uId != null">
+                #{uId,jdbcType=VARCHAR},
+            </if>
+            <if test="uName != null">
+                #{uName,jdbcType=VARCHAR},
+            </if>
+            <if test="uPwd != null">
+                #{uPwd,jdbcType=VARCHAR},
+            </if>
+            <if test="uSex != null">
+                #{uSex,jdbcType=BIT},
+            </if>
+            <if test="uPhone != null">
+                #{uPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="uEmail != null">
+                #{uEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="uTypeid != null">
+                #{uTypeid,jdbcType=INTEGER},
+            </if>
+            <if test="uPhoto != null">
+                #{uPhoto,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.springmvc.entity.User">
+        update user
+        <set>
+            <if test="uName != null">
+                u_name = #{uName,jdbcType=VARCHAR},
+            </if>
+            <if test="uPwd != null">
+                u_pwd = #{uPwd,jdbcType=VARCHAR},
+            </if>
+            <if test="uSex != null">
+                u_sex = #{uSex,jdbcType=BIT},
+            </if>
+            <if test="uPhone != null">
+                u_phone = #{uPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="uEmail != null">
+                u_email = #{uEmail,jdbcType=VARCHAR},
+            </if>
+            <if test="uTypeid != null">
+                u_typeid = #{uTypeid,jdbcType=INTEGER},
+            </if>
+            <if test="uPhoto != null">
+                u_photo = #{uPhoto,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where u_id = #{uId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.User">
+        update user
+        set u_name   = #{uName,jdbcType=VARCHAR},
+            u_pwd    = #{uPwd,jdbcType=VARCHAR},
+            u_sex    = #{uSex,jdbcType=BIT},
+            u_phone  = #{uPhone,jdbcType=VARCHAR},
+            u_email  = #{uEmail,jdbcType=VARCHAR},
+            u_typeid = #{uTypeid,jdbcType=INTEGER},
+            u_photo  = #{uPhoto,jdbcType=VARCHAR}
+        where u_id = #{uId,jdbcType=VARCHAR}
+    </update>
+</mapper>

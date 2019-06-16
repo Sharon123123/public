@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.springmvc.dao.DutyMapper" >
+  <resultMap id="BaseResultMap" type="com.springmvc.entity.Duty" >
+    <id column="d_id" property="dId" jdbcType="INTEGER" />
+    <result column="d_name" property="dName" jdbcType="VARCHAR" />
+    <result column="d_maxcount" property="dMaxcount" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    d_id, d_name, d_maxcount
+  </sql>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from duty
+  </select>
+
+  <select id="countNum" resultType="com.springmvc.entity.RecodCount">
+    select d_name as name ,count(*) as num  from duty inner join user u on duty.d_id = u.u_typeid group by d_id;
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from duty
+    where d_id = #{dId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from duty
+    where d_id = #{dId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.springmvc.entity.Duty" >
+    insert into duty (d_name, d_maxcount
+      )
+    values ( #{dName,jdbcType=VARCHAR}, #{dMaxcount,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.springmvc.entity.Duty" >
+    insert into duty
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="dName != null" >
+        d_name,
+      </if>
+      <if test="dMaxcount != null" >
+        d_maxcount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="dName != null" >
+        #{dName,jdbcType=VARCHAR},
+      </if>
+      <if test="dMaxcount != null" >
+        #{dMaxcount,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.springmvc.entity.Duty" >
+    update duty
+    <set >
+      <if test="dName != null" >
+        d_name = #{dName,jdbcType=VARCHAR},
+      </if>
+      <if test="dMaxcount != null" >
+        d_maxcount = #{dMaxcount,jdbcType=INTEGER},
+      </if>
+    </set>
+    where d_id = #{dId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.springmvc.entity.Duty" >
+    update duty
+    set d_name = #{dName,jdbcType=VARCHAR},
+      d_maxcount = #{dMaxcount,jdbcType=INTEGER}
+    where d_id = #{dId,jdbcType=INTEGER}
+  </update>
+</mapper>
