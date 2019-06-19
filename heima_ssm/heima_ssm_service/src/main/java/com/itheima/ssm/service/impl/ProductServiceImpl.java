@@ -14,7 +14,22 @@ import java.util.List;
 public class ProductServiceImpl implements IProductService{
     @Autowired
     private IProductDao productDao;
+
     public List<Product> findAll() {
+
+        /**
+         * 查询产品
+         */
+
         return productDao.findAll();
+    }
+
+    /**
+     * 保存产品
+     */
+
+    @Override
+    public void save(Product product) {
+        productDao.save(product);
     }
 }

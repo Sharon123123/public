@@ -27,6 +27,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+            <version>5.1.2</version>
+        </dependency>
+        <dependency>
             <groupId>com.itcast</groupId>
             <artifactId>heima_ssm_service</artifactId>
             <version>1.0-SNAPSHOT</version>

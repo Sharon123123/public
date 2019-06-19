@@ -21,7 +21,17 @@ public class ProductController {
         List<Product> ps = productService.findAll();
         System.out.println(ps);
         mv.addObject("productList", ps);
-        mv.setViewName("product-list");
+        mv.setViewName("product-list1");
         return mv;
  }
+
+    /**
+     *
+     * 产品添加
+     */
+    @RequestMapping("/save.do")
+        public String save(Product product)throws Exception{
+        productService.save(product);
+            return "redirect:findAll.do";
+        }
 }
